@@ -1,0 +1,21 @@
+services:
+  waha:
+    image: devlikeapro/waha:latest
+    restart: always
+    ports:
+      - "127.0.0.1:3000:3000"      # נגיש רק מתוך השרת (נכנסים דרך מנהרת SSH)
+    volumes:
+      - ./sessions:/app/.sessions  # שומר את החיבור לווצאפ – לא צריך לסרוק QR אחרי ריסטרט
+    env_file: .env
+    environment:
+      WHATSAPP_HOOK_URL: http://forwarder:5000/webhook
+      WHATSAPP_HOOK_EVENTS: message.any
+      WHATSAPP_START_SESSION: default
+      WHATSAPP_RESTART_ALL_SESSIONS: "True"
+
+  forwarder:
+    build: ./forwarder
+    restart: always
+    volumes:
+      - ./data:/data               # מסד הנתונים של ההודעות
+    env_file: .env
